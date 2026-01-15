@@ -44,6 +44,13 @@ public class CarService {
                 .toList();
     }
 
+    public Car getCarById(Long carId) {
+        return carRepository.findById(carId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Car not found")
+                );
+    }
+
     public Car deactivateCar(Long carId) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() ->

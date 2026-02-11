@@ -1,5 +1,6 @@
 package com.naveen.easycar.service;
 
+import com.naveen.easycar.dto.CarRequestDto;
 import com.naveen.easycar.entity.Car;
 import com.naveen.easycar.enums.CarCategory;
 import com.naveen.easycar.exception.BookingConflictException;
@@ -33,6 +34,31 @@ public class CarService {
         return carRepository.save(car);
     }
 
+    public Car updateCar(Long card_id, CarRequestDto dto){
+
+        Car car = carRepository.findById(card_id).orElseThrow(() -> {
+            throw new BookingConflictException(
+                    "Car not found"
+            );
+        });
+
+        carRepository.findByRegistrationNumber(dto.getRegistrationNumber())
+                .filter(existing -> !existing.getId().equals(card_id))
+                .ifPresent(existing -> {
+                    throw new BookingConflictException(
+                            "Registration number already in use"
+                    );
+                });
+
+        car.setRegistrationNumber(dto.getRegistrationNumber());
+        car.setBrand(dto.getBrand());
+        car.setModel(dto.getModel());
+        car.setCategory(dto.getCategory());
+        car.setDailyRate(dto.getDailyRate());
+
+        return carRepository.save(car);
+    }
+
     public List<Car> getAllActiveCars() {
         return carRepository.findByActiveTrue();
     }
@@ -46,6 +72,13 @@ public class CarService {
 
     public Car getCarById(Long carId) {
         return carRepository.findById(carId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Car not found")
+                );
+    }
+
+    public Car getCarByRegistration(String registrationNumber){
+        return carRepository.findByRegistrationNumber(registrationNumber)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Car not found")
                 );

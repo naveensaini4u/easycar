@@ -122,7 +122,7 @@ public class ReservationService {
         reservation.setStartDate(start);
         reservation.setEndDate(end);
         reservation.setTotalCost(cost);
-        reservation.setStatus(ReservationStatus.ACTIVE);
+        reservation.setStatus(ReservationStatus.PENDING_PAYMENT);
 
         return reservationRepository.save(reservation);
     }
@@ -147,6 +147,15 @@ public class ReservationService {
 
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
+    }
+
+    public Reservation getReservations(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Reservation not found")
+                );
+
+        return reservation;
     }
 
 
